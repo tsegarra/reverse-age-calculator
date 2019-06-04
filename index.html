@@ -1,0 +1,630 @@
+<html>
+<head>
+<title>Age Reversal Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script
+  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+	  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+		  crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/9868201231.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+<script>
+(function ($) {
+	var bdays = {},
+		nextBdayId = 0,
+		reversals;
+
+	var incrementDay = function(dateObj) {
+		dateObj.day++;
+	};
+
+	var decrementDay = function(dateObj) {
+		dateObj.day--;
+	};
+
+	var isBetween = function (dateObj, earliest, latest) {
+		if (dateObj.year < earliest.year || dateObj.year > latest.year)
+			return false;
+		if ((dateObj.year == earliest.year && dateObj.month < earliest.month) ||
+				(dateObj.year == latest.year && dateObj.month > latest.month))
+			return false;
+		if ((dateObj.year == earliest.year && dateObj.month == earliest.month && dateObj.day < earliest.day) ||
+				(dateObj.year == latest.year && dateObj.month == latest.month && dateObj.day > latest.day))
+			return false;
+		return true;
+	};
+
+	var testIsBetween = function() {
+		var d1 = { year: 2000, month: 1, day: 1 },
+			d2 = { year: 1999, month: 12, day: 30 },
+			d3 = { year: 1999, month: 12, day: 31 },
+			d4 = { year: 2001, month: 12, day: 31 },
+			d5 = { year: 2000, month: 12, day: 31 };
+
+		console.log(isBetween(d1, d2, d3) == false);
+		console.log(isBetween(d1, d3, d4) == true);
+		console.log(isBetween(d1, d5, d4) == false);
+		console.log(isBetween(d2, d3, d1) == false);
+		console.log(isBetween(d2, d3, d4) == false);
+		console.log(isBetween(d2, d3, d5) == false);
+		console.log(isBetween(d2, d5, d4) == false);
+		console.log(isBetween(d3, d2, d1) == true);
+		console.log(isBetween(d3, d1, d4) == false);
+	};
+
+	var isReversal = function (a, b) {
+		var earliest = {}, latest = {}, mid = {};
+		for (var cycle = -10; cycle <= 10; cycle++) {
+			earliest.year = (a.year + cycle*9) - 1;
+			mid.year = earliest.year + 1;
+			latest.year = earliest.year + 2;
+			earliest.month = a.month;
+			latest.month = a.month;
+			mid.month = a.month;
+			earliest.day = a.day;
+			latest.day = a.day;
+			mid.day = a.day;
+			incrementDay(earliest);
+			decrementDay(latest);
+			if (isBetween(b, earliest, mid))
+				return { cycle: cycle, pos: -1 };
+			if (isBetween(b, mid, latest))
+				return { cycle: cycle, pos: 1 };
+		}
+
+		return null;
+	};
+
+	var findReversals = function (days) {
+		reversals = [];
+
+		var dayKeys = Object.keys(days);
+		var numCycles, startYear;
+		var nextReversalFound = false;
+		var reversalStartDay = {}, reversalEndDay = {};
+		var reversal;
+		var keyI, keyJ;
+		for (var i = 0; i < dayKeys.length; i++) {
+			keyI = dayKeys[i];
+			for (var j = i + 1; j < dayKeys.length; j++) {
+				keyJ = dayKeys[j];
+				if (numCycles = isReversal(days[keyI], days[keyJ])) {
+					if (numCycles.cycle == 0) continue;
+
+					reverse = false;
+					if (days[keyJ].month > days[keyI].month || ((days[keyJ].month == days[keyI].month) && days[keyJ].day > days[keyI].day)) {
+						reverse = true;
+					}
+
+					if (numCycles.pos < 0) {
+						reversalStartDay.month = days[keyI].month;
+						reversalStartDay.day = days[keyI].day;
+						reversalEndDay.month = days[keyJ].month;
+						reversalEndDay.day = days[keyJ].day;
+						if (reverse) {
+							reversalStartDay.year = days[keyJ].year + numCycles.cycle + 1;
+						} else {
+							reversalStartDay.year = days[keyJ].year + numCycles.cycle;
+						}
+					} else {
+						reversalStartDay.month = days[keyJ].month;
+						reversalStartDay.day = days[keyJ].day;
+						reversalEndDay.month = days[keyI].month;
+						reversalEndDay.day = days[keyI].day;
+						reversalStartDay.year = days[keyI].year + numCycles.cycle;
+						if (reverse) {
+							reversalStartDay.year = days[keyJ].year + numCycles.cycle;
+						} else {
+							reversalStartDay.year = days[keyJ].year + numCycles.cycle;
+						}
+					}
+					while (!nextReversalFound) {
+						if (new Date(reversalStartDay.year, reversalStartDay.month - 1, reversalStartDay.day) >= new Date()) {
+							nextReversalFound = true;
+						} else {
+							reversalStartDay.year += 11;
+						}
+					}
+
+					reversalEndDay.year = reversalStartDay.year;
+					if (reverse) {
+						if (numCycles.pos > 0) {
+							reversalEndDay.year += 1;
+						}
+					} else {
+						if (numCycles.pos < 0) {
+							reversalEndDay.year += 1;
+						}
+					}
+
+					reversal = {
+						start: new Date(reversalStartDay.year, reversalStartDay.month - 1, reversalStartDay.day),
+						end: new Date(reversalEndDay.year, reversalEndDay.month - 1, reversalEndDay.day),
+						first: numCycles.pos > 0 ? days[keyJ] : days[keyI],
+						last: numCycles.pos < 0 ? days[keyJ] : days[keyI],
+					};
+					reversals.push(reversal);
+					nextReversalFound = false;
+				}
+			}
+		}
+	};
+
+	var addReversalAges = function() {
+		var millisecondsPerYear = 1000*60*60*24*365;
+		for (var i = 0; i < reversals.length; i++) {
+			reversals[i].firstAge = Math.floor((reversals[i].start.getTime() - new Date(reversals[i].first.year, reversals[i].first.month - 1, reversals[i].first.day).getTime())/millisecondsPerYear);
+			reversals[i].lastAge = Math.floor((reversals[i].start.getTime() - new Date(reversals[i].last.year, reversals[i].last.month - 1, reversals[i].last.day).getTime())/millisecondsPerYear);
+		}
+	};
+
+	var compareReversalObjects = function(a, b) {
+		if (a.start < b.start) return -1;
+		if (a.start > b.start) return 1;
+		return 0;
+	};
+
+	var displayReversalsOnUI = function() {
+		$('.reversals-display-container').show();
+
+		if (reversals.length < 1) {
+			$('#reversals-display').html('<p>No reversals found.</p>');
+			return;
+		}
+
+		$('#reversals-display').empty();
+
+		var reversalText;
+		for (var i = 0; i < reversals.length; i++) {
+			reversalText = 'From ' +
+				(reversals[i].start.getMonth() + 1) + '/' +
+				(reversals[i].start.getDate()) + '/' +
+				(reversals[i].start.getYear() + 1900) +
+				' to ' +
+				(reversals[i].end.getMonth() + 1) + '/' +
+				(reversals[i].end.getDate()) + '/' +
+				(reversals[i].end.getYear() + 1900) +
+				', ' +
+				reversals[i].first.name +
+				' will be ' +
+				reversals[i].firstAge +
+				' and ' +
+				reversals[i].last.name +
+				' will be ' +
+				reversals[i].lastAge +
+				'.';
+			$('<p>').text(reversalText).appendTo('#reversals-display');
+		}
+	};
+
+	var addNewBdayFromUI = function() {
+		var day = $('#day').val(),
+			month = $('#month').val(),
+			year = $('#year').val(),
+			name = $('#name').val();
+
+		var dateObj = {
+			year: parseInt(year),
+			month: parseInt(month),
+			day: parseInt(day),
+			name: name,
+		};
+
+		bdays[nextBdayId] = dateObj;
+		addNewBdayToUI(nextBdayId, dateObj);
+		nextBdayId++;
+	};
+
+	var makeEditable = function(id) {
+		var bdayEl = $('#bday-' + id),
+			bdayNameEl = bdayEl.find('.bdayName'),
+			bdayMonthEl = bdayEl.find('.bdayMonth'),
+			bdayDayEl = bdayEl.find('.bdayDay'),
+			bdayYearEl = bdayEl.find('.bdayYear'),
+			bdayName = bdayNameEl.text(),
+			bdayMonth = parseInt(bdayMonthEl.text()),
+			bdayDay = parseInt(bdayDayEl.text()),
+			bdayYear = parseInt(bdayYearEl.text());
+		$('<input>').attr('type', 'text')
+			.attr('id', 'bdayName-' + id)
+			.val(bdayName)
+			.insertAfter(bdayNameEl);
+		$('#month').clone()
+			.attr('id', 'bdayMonth-' + id)
+			.val(bdayMonth)
+			.insertAfter(bdayMonthEl);
+		$('#day').clone()
+			.attr('id', 'bdayDay-' + id)
+			.val(bdayDay)
+			.insertAfter(bdayDayEl);
+		$('#year').clone()
+			.attr('id', 'bdayYear-' + id)
+			.val(bdayYear)
+			.insertAfter(bdayYearEl);
+		bdayNameEl.hide();
+		bdayDayEl.hide();
+		bdayMonthEl.hide();
+		bdayYearEl.hide();
+		$('.edit-icon').hide();
+		bdayEl.find('.bdayControlBtns').show();
+	};
+
+	var makeUneditable = function(id) {
+		var bdayEl = $('#bday-' + id),
+			bdayNameEl = bdayEl.find('.bdayName'),
+			bdayMonthEl = bdayEl.find('.bdayMonth'),
+			bdayDayEl = bdayEl.find('.bdayDay'),
+			bdayYearEl = bdayEl.find('.bdayYear'),
+			bdayName = $('#bdayName-' + id).val(),
+			bdayDay = $('#bdayDay-' + id).val(),
+			bdayMonth = $('#bdayMonth-' + id).val(),
+			bdayYear = $('#bdayYear-' + id).val();
+		bdayNameEl.text(bdayName);
+		bdayMonthEl.text(bdayMonth);
+		bdayDayEl.text(bdayDay);
+		bdayYearEl.text(bdayYear);
+		bdays[id].name = bdayName;
+		bdays[id].month = parseInt(bdayMonth);
+		bdays[id].day = parseInt(bdayDay);
+		bdays[id].year = parseInt(bdayYear);
+		$('#bdayName-' + id).remove();
+		$('#bdayDay-' + id).remove();
+		$('#bdayMonth-' + id).remove();
+		$('#bdayYear-' + id).remove();
+		bdayNameEl.show();
+		bdayDayEl.show();
+		bdayMonthEl.show();
+		bdayYearEl.show();
+		$('.edit-icon').show();
+		bdayEl.find('.bdayControlBtns').hide();
+	};
+
+	var addNewBdayToUI = function(id, dateObj) {
+		var bdayHTML = '<span class="bdayName">' + dateObj.name + '</span>' +
+			' &mdash; ' + 
+			'<span class="bdayMonth">' + dateObj.month + '</span>' +
+			'/' +
+			'<span class="bdayDay">' + dateObj.day + '</span>' +
+			'/' +
+			'<span class="bdayYear">' + dateObj.year + '</span>';
+		var bdayEl = $('<div>').attr('id', 'bday-' + id).html(bdayHTML).appendTo('#bday-list');
+		$('<div>').addClass('edit-icon')
+			.html('<i class="fas fa-edit"></i>')
+			.click(function() {
+				makeEditable(id);
+			})
+			.appendTo(bdayEl);
+		var controlBtns = $('<div>').addClass('bdayControlBtns')
+			.appendTo(bdayEl);
+		$('<i>').attr('class', 'bdayControlBtn saveBtn fas fa-check')
+			.click(function() {
+				makeUneditable(id);
+				checkForReversals();
+			})
+			.appendTo(controlBtns);
+		$('<i>').attr('class', 'bdayControlBtn deleteBtn fas fa-trash')
+			.click(function() {
+				bdayEl.remove();
+				delete bdays[id];
+				checkForReversals();
+			})
+			.appendTo(controlBtns);
+	};
+
+	var resetBdayField = function() {
+		$('#day').val('');
+		$('#month').val('');
+		$('#year').val('');
+		$('#name').val('');
+	};
+
+	var updateButtonVisibility = function() {
+		if ($('#name').val() == '' || $('#month').val() == null ||
+				$('#year').val() == null || $('#day').val() == null) {
+			$('#btn-next').hide();
+		} else {
+			$('#btn-next').show();
+		}
+	};
+
+	var checkForReversals = function() {
+		if (Object.keys(bdays).length >= 2) {
+			findReversals(bdays);
+			addReversalAges();
+			reversals.sort(compareReversalObjects);
+			displayReversalsOnUI();
+		}
+	};
+
+	var attachEventHandlers = function() {
+		$('form select').change(updateButtonVisibility);
+		$('form input').on('keyup', updateButtonVisibility);
+
+		$('#btn-next').click(function(e) {
+			e.preventDefault();
+			addNewBdayFromUI();
+			resetBdayField();
+			updateButtonVisibility();
+			checkForReversals();
+		});
+	};
+
+	$(document).ready(function() {
+		resetBdayField();
+		attachEventHandlers();
+	});
+})(jQuery);
+</script>
+</head>
+<body>
+	<h2>Age Reversal Calculator</h2>
+	<p>Enter at least two dates of birth below.</p>
+	<div class="bday-entry-form">
+		<form class="bday-entry-field" autocomplete="off">
+			<input id="name" placeholder="Name" />
+			<select id="month">
+				<option disabled selected value="">Month</option>
+				<option value="1">January</option>
+				<option value="2">February</option>
+				<option value="3">March</option>
+				<option value="4">April</option>
+				<option value="5">May</option>
+				<option value="6">June</option>
+				<option value="7">July</option>
+				<option value="8">August</option>
+				<option value="9">September</option>
+				<option value="10">October</option>
+				<option value="11">November</option>
+				<option value="12">December</option>
+			</select>
+
+			<select id="day">
+				<option disabled selected value="">Day</option>
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+				<option>6</option>
+				<option>7</option>
+				<option>8</option>
+				<option>9</option>
+				<option>10</option>
+				<option>11</option>
+				<option>12</option>
+				<option>13</option>
+				<option>14</option>
+				<option>15</option>
+				<option>16</option>
+				<option>17</option>
+				<option>18</option>
+				<option>19</option>
+				<option>20</option>
+				<option>21</option>
+				<option>22</option>
+				<option>23</option>
+				<option>24</option>
+				<option>25</option>
+				<option>26</option>
+				<option>27</option>
+				<option>28</option>
+				<option>29</option>
+				<option>30</option>
+				<option>31</option>
+			</select>
+
+			<select id="year">
+				<option disabled selected value="">Year</option>
+				<option>2019</option>
+				<option>2018</option>
+				<option>2017</option>
+				<option>2016</option>
+				<option>2015</option>
+				<option>2014</option>
+				<option>2013</option>
+				<option>2012</option>
+				<option>2011</option>
+				<option>2010</option>
+				<option>2009</option>
+				<option>2008</option>
+				<option>2007</option>
+				<option>2006</option>
+				<option>2005</option>
+				<option>2004</option>
+				<option>2003</option>
+				<option>2002</option>
+				<option>2001</option>
+				<option>2000</option>
+				<option>1999</option>
+				<option>1998</option>
+				<option>1997</option>
+				<option>1996</option>
+				<option>1995</option>
+				<option>1994</option>
+				<option>1993</option>
+				<option>1992</option>
+				<option>1991</option>
+				<option>1990</option>
+				<option>1989</option>
+				<option>1988</option>
+				<option>1987</option>
+				<option>1986</option>
+				<option>1985</option>
+				<option>1984</option>
+				<option>1983</option>
+				<option>1982</option>
+				<option>1981</option>
+				<option>1980</option>
+				<option>1979</option>
+				<option>1978</option>
+				<option>1977</option>
+				<option>1976</option>
+				<option>1975</option>
+				<option>1974</option>
+				<option>1973</option>
+				<option>1972</option>
+				<option>1971</option>
+				<option>1970</option>
+				<option>1969</option>
+				<option>1968</option>
+				<option>1967</option>
+				<option>1966</option>
+				<option>1965</option>
+				<option>1964</option>
+				<option>1963</option>
+				<option>1962</option>
+				<option>1961</option>
+				<option>1960</option>
+				<option>1959</option>
+				<option>1958</option>
+				<option>1957</option>
+				<option>1956</option>
+				<option>1955</option>
+				<option>1954</option>
+				<option>1953</option>
+				<option>1952</option>
+				<option>1951</option>
+				<option>1950</option>
+				<option>1949</option>
+				<option>1948</option>
+				<option>1947</option>
+				<option>1946</option>
+				<option>1945</option>
+				<option>1944</option>
+				<option>1943</option>
+				<option>1942</option>
+				<option>1941</option>
+				<option>1940</option>
+				<option>1939</option>
+				<option>1938</option>
+				<option>1937</option>
+				<option>1936</option>
+				<option>1935</option>
+				<option>1934</option>
+				<option>1933</option>
+				<option>1932</option>
+				<option>1931</option>
+				<option>1930</option>
+				<option>1929</option>
+				<option>1928</option>
+				<option>1927</option>
+				<option>1926</option>
+				<option>1925</option>
+				<option>1924</option>
+				<option>1923</option>
+				<option>1922</option>
+				<option>1921</option>
+				<option>1920</option>
+				<option>1919</option>
+				<option>1918</option>
+				<option>1917</option>
+				<option>1916</option>
+				<option>1915</option>
+				<option>1914</option>
+				<option>1913</option>
+				<option>1912</option>
+				<option>1911</option>
+				<option>1910</option>
+				<option>1909</option>
+				<option>1908</option>
+				<option>1907</option>
+				<option>1906</option>
+				<option>1905</option>
+				<option>1904</option>
+				<option>1903</option>
+				<option>1902</option>
+				<option>1901</option>
+				<option>1900</option>
+			</select>
+		</form><!-- /.bday-entry-field -->
+		
+		<div class="buttons-container">
+			<i id="btn-next" class="fas fa-long-arrow-alt-right" style="display:none;"></i>
+		</div><!-- /.buttons-container -->
+	</div><!-- /.bday-entry-form -->
+
+	<div id="bday-list">
+	</div><!-- /.bday-list -->
+
+	<div style="display:none;" class="reversals-display-container">
+		<h3>Age reversals</h3>
+		<div id="reversals-display"></div>
+	</div>
+<style>
+body, input, select, button {
+	font-family: 'Roboto', sans-serif;
+}
+body {
+	max-width:500px;
+	margin:0 auto;
+	padding:16px;
+	box-sizing:border-box;
+}
+button {
+	background: none;
+	border: 0;
+	background-color: green;
+	color: #fff;
+	padding: 8px;
+	width:100%;
+	border-radius: 2px;
+	cursor: pointer;
+}
+#btn-next {
+	margin-top:8px;
+	width: 100%;
+	display: block;
+	text-align: center;
+	background-color: green;
+	color: #fff;
+	padding: 8px;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+#bday-list {
+	margin-bottom:8px;
+}
+#bday-list > div {
+	margin-bottom:4px;
+}
+.edit-icon {
+	display:inline-block;
+	margin-left:8px;
+	cursor:pointer;
+}
+.bday-entry-form {
+	padding:8px;
+	background-color:#e2e2e2;
+	border-radius:2px;
+	margin-bottom:16px;
+	margin-left:-8px;
+	margin-right:-8px;
+}
+form.bday-entry-field {
+	margin:0;
+}
+
+.bdayControlBtns {
+	display:none;
+	margin-top:8px;
+	font-size:0;
+}
+.bdayControlBtn {
+	width:50%;
+	display:inline-block;
+	font-size:16px;
+	color:#fff;
+	padding:8px;
+	cursor:pointer;
+	text-align:center;
+	box-sizing:border-box;
+}
+.deleteBtn {
+	background-color:#ff4e4e;
+}
+.saveBtn {
+	background-color:#0aa50a;
+}
+</style>
+</body>
+</html>
