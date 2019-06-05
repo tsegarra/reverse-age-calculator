@@ -1,0 +1,85 @@
+body, input, select, button {
+	font-family: 'Roboto', sans-serif;
+}
+
+body {
+	max-width:500px;
+	margin:0 auto;
+	padding:16px;
+	box-sizing:border-box;
+}
+
+button {
+	background: none;
+	border: 0;
+	background-color: green;
+	color: #fff;
+	padding: 8px;
+	width:100%;
+	border-radius: 2px;
+	cursor: pointer;
+}
+
+#btn-next {
+	margin-top:8px;
+	width: 100%;
+	display: block;
+	text-align: center;
+	background-color: green;
+	color: #fff;
+	padding: 8px;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+
+#bday-list {
+	margin-bottom:8px;
+}
+
+#bday-list > div {
+	margin-bottom:4px;
+}
+
+.edit-icon {
+	display:inline-block;
+	margin-left:8px;
+	cursor:pointer;
+}
+
+.bday-entry-form {
+	padding:8px;
+	background-color:#e2e2e2;
+	border-radius:2px;
+	margin-bottom:16px;
+	margin-left:-8px;
+	margin-right:-8px;
+}
+
+form.bday-entry-field {
+	margin:0;
+}
+
+.bdayControlBtns {
+	display:none;
+	margin-top:8px;
+	font-size:0;
+}
+
+.bdayControlBtn {
+	width:50%;
+	display:inline-block;
+	font-size:16px;
+	color:#fff;
+	padding:8px;
+	cursor:pointer;
+	text-align:center;
+	box-sizing:border-box;
+}
+
+.deleteBtn {
+	background-color:#ff4e4e;
+}
+
+.saveBtn {
+	background-color:#0aa50a;
+}
