@@ -2,12 +2,6 @@
 	var bdays = {},
 		nextBdayId = 0;
 
-	var compareReversalObjects = function(a, b) {
-		if (a.start < b.start) return -1;
-		if (a.start > b.start) return 1;
-		return 0;
-	};
-
 	var displayReversalsOnUI = function() {
 		$('.reversals-display-container').show();
     reversals = ReversalFinder.reversals;
@@ -174,8 +168,6 @@
 	var checkForReversals = function() {
 		if (Object.keys(bdays).length >= 2) {
 			ReversalFinder.findReversals(bdays);
-			ReversalFinder.addReversalAges();
-			ReversalFinder.reversals.sort(compareReversalObjects);
 			displayReversalsOnUI();
 		}
 	};

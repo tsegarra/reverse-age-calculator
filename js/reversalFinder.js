@@ -3,6 +3,12 @@ var ReversalFinder = ReversalFinder || {};
 (function() {
   this.reversals = [];
 
+	var compareReversalObjects = function(a, b) {
+		if (a.start < b.start) return -1;
+		if (a.start > b.start) return 1;
+		return 0;
+	};
+
 	var isReversal = function (a, b) {
 		var earliest = new Date(a.date.getTime()),
       mid = new Date(a.date.getTime()),
@@ -27,14 +33,6 @@ var ReversalFinder = ReversalFinder || {};
 		return null;
 	};
 
-	this.addReversalAges = function() {
-		var millisecondsPerYear = 1000*60*60*24*365;
-		for (var i = 0; i < this.reversals.length; i++) {
-			this.reversals[i].firstAge = Math.floor((this.reversals[i].start.getTime() - this.reversals[i].first.date.getTime())/millisecondsPerYear);
-			this.reversals[i].lastAge = Math.floor((this.reversals[i].start.getTime() - this.reversals[i].last.date.getTime())/millisecondsPerYear);
-		}
-	};
-
   this.findReversals = function (days) {
     var dayKeys = Object.keys(days);
     var numCycles, startYear;
@@ -42,6 +40,8 @@ var ReversalFinder = ReversalFinder || {};
     var reversalStartDay, reversalEndDay;
     var reversal;
     var keyI, keyJ;
+    var first, last;
+    var millisecondsPerYear = 1000*60*60*24*365;
     this.reversals = [];
     for (var i = 0; i < dayKeys.length; i++) {
       keyI = dayKeys[i];
@@ -99,17 +99,22 @@ var ReversalFinder = ReversalFinder || {};
             }
           }
 
+          first = numCycles.pos > 0 ? days[keyJ] : days[keyI];
+          last = numCycles.pos < 0 ? days[keyJ] : days[keyI];
           reversal = {
             start: reversalStartDay,
             end: reversalEndDay,
-            first: numCycles.pos > 0 ? days[keyJ] : days[keyI],
-            last: numCycles.pos < 0 ? days[keyJ] : days[keyI],
+            first: first,
+            last: last,
+            firstAge: Math.floor((reversalStartDay.getTime() - first.date.getTime())/millisecondsPerYear),
+            lastAge: Math.floor((reversalStartDay.getTime() - last.date.getTime())/millisecondsPerYear),
           };
           this.reversals.push(reversal);
           nextReversalFound = false;
         }
       }
     }
+    this.reversals.sort(compareReversalObjects);
   };
 }).call(ReversalFinder);
 
