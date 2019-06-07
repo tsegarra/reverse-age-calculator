@@ -15,23 +15,7 @@
 
 		var reversalText;
 		for (var i = 0; i < reversals.length; i++) {
-			reversalText = 'From ' +
-				(reversals[i].start.getMonth() + 1) + '/' +
-				(reversals[i].start.getDate()) + '/' +
-				(reversals[i].start.getYear() + 1900) +
-				' to ' +
-				(reversals[i].end.getMonth() + 1) + '/' +
-				(reversals[i].end.getDate()) + '/' +
-				(reversals[i].end.getYear() + 1900) +
-				', ' +
-				reversals[i].first.name +
-				' will be ' +
-				reversals[i].firstAge +
-				' and ' +
-				reversals[i].last.name +
-				' will be ' +
-				reversals[i].lastAge +
-				'.';
+      reversalText = reversals[i].toString();
 			$('<p>').text(reversalText).appendTo('#reversals-display');
 		}
 	};
@@ -167,7 +151,7 @@
 
 	var checkForReversals = function() {
 		if (Object.keys(bdays).length >= 2) {
-			ReversalFinder.findReversals(bdays);
+			ReversalFinder.findReversals(Object.values(bdays));
 			displayReversalsOnUI();
 		}
 	};
