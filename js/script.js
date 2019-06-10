@@ -129,6 +129,7 @@
 				bdayEl.remove();
 				delete bdays[id];
 				checkForReversals();
+        $('.edit-icon').show();
 			})
 			.appendTo(controlBtns);
 	};

@@ -26,7 +26,42 @@ test('One reversal for two dates', () => {
   reversal.end.setHours(0,0,0,0);
   expect(reversal.start).toEqual(expectedStart);
   expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages).toEqual([{ name: 'Tom', age: 31 }, { name: 'Sadie', age: 13 }]);
+  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 31 }, { name: 'Sadie', age: 13 }].map(a => a.age).sort());
+});
+
+test('One reversal for two dates II', () => {
+  var day1 = {
+    name: 'Dan',
+    date: new Date(1993, 7 - 1, 26),
+  },
+  day2 = {
+    name: 'Elena',
+    date: new Date(1957, 9 - 1, 8),
+  };
+  ReversalFinder.findReversals([day1, day2]);
+  expect(ReversalFinder.reversals.length).toBe(1);
+
+  var reversal = ReversalFinder.reversals[0];
+  var expectedStart = new Date(2019, 9 - 1, 8);
+  var expectedEnd = new Date(2020, 7 - 1, 26);
+  reversal.start.setHours(0,0,0,0);
+  reversal.end.setHours(0,0,0,0);
+  expect(reversal.start).toEqual(expectedStart);
+  expect(reversal.end).toEqual(expectedEnd);
+  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Dan', age: 26 }, { name: 'Elena', age: 62 }].map(a => a.age).sort());
+});
+
+test('No reversal for two dates', () => {
+  var day1 = {
+    name: 'Elena',
+    date: new Date(1957, 9 - 1, 8),
+  },
+  day2 = {
+    name: 'Christina',
+    date: new Date(1994, 9 - 1, 27),
+  };
+  ReversalFinder.findReversals([day1, day2]);
+  expect(ReversalFinder.reversals.length).toBe(0);
 });
 
 test('Three reversals for three dates', () => {
@@ -52,7 +87,7 @@ test('Three reversals for three dates', () => {
   reversal.end.setHours(0,0,0,0);
   expect(reversal.start).toEqual(expectedStart);
   expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages).toEqual([{ name: 'Tom', age: 31 }, { name: 'Sadie', age: 13 }]);
+  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 31 }, { name: 'Sadie', age: 13 }].map(a => a.age).sort());
 
   reversal = ReversalFinder.reversals[1];
   expectedStart = new Date(2027, 4, 22);
@@ -61,7 +96,7 @@ test('Three reversals for three dates', () => {
   reversal.end.setHours(0,0,0,0);
   expect(reversal.start).toEqual(expectedStart);
   expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages).toEqual([{ name: 'Sadie', age: 15 }, { name: 'Julie', age: 51 }]);
+  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Sadie', age: 15 }, { name: 'Julie', age: 51 }].map(a => a.age).sort());
 
   reversal = ReversalFinder.reversals[2];
   expectedStart = new Date(2029, 4, 25);
@@ -70,5 +105,5 @@ test('Three reversals for three dates', () => {
   reversal.end.setHours(0,0,0,0);
   expect(reversal.start).toEqual(expectedStart);
   expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages).toEqual([{ name: 'Tom', age: 35 }, { name: 'Julie', age: 53 }]);
+  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 35 }, { name: 'Julie', age: 53 }].map(a => a.age).sort());
 });
