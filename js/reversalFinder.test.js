@@ -22,11 +22,11 @@ test('One reversal for two dates', () => {
   var reversal = ReversalFinder.reversals[0];
   var expectedStart = new Date(2025, 4, 25);
   var expectedEnd = new Date(2026, 4, 22);
-  reversal.start.setHours(0,0,0,0);
-  reversal.end.setHours(0,0,0,0);
-  expect(reversal.start).toEqual(expectedStart);
-  expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 31 }, { name: 'Sadie', age: 13 }].map(a => a.age).sort());
+  reversal.getStartDate().setHours(0,0,0,0);
+  reversal.getEndDate().setHours(0,0,0,0);
+  expect(reversal.getStartDate()).toEqual(expectedStart);
+  expect(reversal.getEndDate()).toEqual(expectedEnd);
+  expect(reversal.getAges().map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 31 }, { name: 'Sadie', age: 13 }].map(a => a.age).sort());
 });
 
 test('One reversal for two dates II', () => {
@@ -44,11 +44,11 @@ test('One reversal for two dates II', () => {
   var reversal = ReversalFinder.reversals[0];
   var expectedStart = new Date(2019, 9 - 1, 8);
   var expectedEnd = new Date(2020, 7 - 1, 26);
-  reversal.start.setHours(0,0,0,0);
-  reversal.end.setHours(0,0,0,0);
-  expect(reversal.start).toEqual(expectedStart);
-  expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Dan', age: 26 }, { name: 'Elena', age: 62 }].map(a => a.age).sort());
+  reversal.getStartDate().setHours(0,0,0,0);
+  reversal.getEndDate().setHours(0,0,0,0);
+  expect(reversal.getStartDate()).toEqual(expectedStart);
+  expect(reversal.getEndDate()).toEqual(expectedEnd);
+  expect(reversal.getAges().map(a => a.age).sort()).toEqual([{ name: 'Dan', age: 26 }, { name: 'Elena', age: 62 }].map(a => a.age).sort());
 });
 
 test('No reversal for two dates', () => {
@@ -83,27 +83,27 @@ test('Three reversals for three dates', () => {
   var reversal = ReversalFinder.reversals[0];
   var expectedStart = new Date(2025, 4, 25);
   var expectedEnd = new Date(2026, 4, 22);
-  reversal.start.setHours(0,0,0,0);
-  reversal.end.setHours(0,0,0,0);
-  expect(reversal.start).toEqual(expectedStart);
-  expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 31 }, { name: 'Sadie', age: 13 }].map(a => a.age).sort());
+  reversal.getStartDate().setHours(0,0,0,0);
+  reversal.getEndDate().setHours(0,0,0,0);
+  expect(reversal.getStartDate()).toEqual(expectedStart);
+  expect(reversal.getEndDate()).toEqual(expectedEnd);
+  expect(reversal.getAges().map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 31 }, { name: 'Sadie', age: 13 }].map(a => a.age).sort());
 
   reversal = ReversalFinder.reversals[1];
   expectedStart = new Date(2027, 4, 22);
   expectedEnd = new Date(2027, 7, 12);
-  reversal.start.setHours(0,0,0,0);
-  reversal.end.setHours(0,0,0,0);
-  expect(reversal.start).toEqual(expectedStart);
-  expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Sadie', age: 15 }, { name: 'Julie', age: 51 }].map(a => a.age).sort());
+  reversal.getStartDate().setHours(0,0,0,0);
+  reversal.getEndDate().setHours(0,0,0,0);
+  expect(reversal.getStartDate()).toEqual(expectedStart);
+  expect(reversal.getEndDate()).toEqual(expectedEnd);
+  expect(reversal.getAges().map(a => a.age).sort()).toEqual([{ name: 'Sadie', age: 15 }, { name: 'Julie', age: 51 }].map(a => a.age).sort());
 
   reversal = ReversalFinder.reversals[2];
   expectedStart = new Date(2029, 4, 25);
   expectedEnd = new Date(2029, 7, 12);
-  reversal.start.setHours(0,0,0,0);
-  reversal.end.setHours(0,0,0,0);
-  expect(reversal.start).toEqual(expectedStart);
-  expect(reversal.end).toEqual(expectedEnd);
-  expect(reversal.ages.map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 35 }, { name: 'Julie', age: 53 }].map(a => a.age).sort());
+  reversal.getStartDate().setHours(0,0,0,0);
+  reversal.getEndDate().setHours(0,0,0,0);
+  expect(reversal.getStartDate()).toEqual(expectedStart);
+  expect(reversal.getEndDate()).toEqual(expectedEnd);
+  expect(reversal.getAges().map(a => a.age).sort()).toEqual([{ name: 'Tom', age: 35 }, { name: 'Julie', age: 53 }].map(a => a.age).sort());
 });

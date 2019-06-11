@@ -1,16 +1,35 @@
 var ReversalFinder = ReversalFinder || {};
 
-// @TODO Make this object cleaner, explicitly define properties
 function Reversal () {
+  var startDate;
+  var endDate;
+  var ages;
+
+  this.setStartDate = function (startDate) {
+    this.startDate = startDate;
+  };
+
+  this.setEndDate = function (endDate) {
+    this.endDate = endDate;
+  };
+
+  this.setAges = function (ages) {
+    this.ages = ages;
+  };
+
+  this.getStartDate = function() { return this.startDate; }
+  this.getEndDate = function() { return this.endDate; }
+  this.getAges = function() { return this.ages; }
+
   this.toString = function() {
     return 'From ' +
       (this.start.getMonth() + 1) + '/' +
       (this.start.getDate()) + '/' +
-      (this.start.getYear() + 1900) +
+      (this.start.getFullYear()) +
       ' to ' +
       (this.end.getMonth() + 1) + '/' +
       (this.end.getDate()) + '/' +
-      (this.end.getYear() + 1900) +
+      (this.end.getFullYear()) +
       ', ' +
       this.ages[0].name + ' will be ' + this.ages[0].age +
       ' and ' +
@@ -20,12 +39,14 @@ function Reversal () {
 }
 
 (function() {
+  const millisecondsPerYear = 1000*60*60*24*365;
+
   this.reversals = [];
 
-  // Given 2 bday objects, return a reversal obj if a reversal is found, else null.
-  this.getReversal = function (dayI, dayJ) {
-    const millisecondsPerYear = 1000*60*60*24*365;
-
+  /*
+   * Given two birthday objects, return a reversal object, or null if none exists.
+   */
+  this.getReversalDates = function (dayI, dayJ) {
     let yearsDiff = Math.abs((dayJ.date - dayI.date)/millisecondsPerYear),
       reversalExists = yearsDiff%9 <= 1 || yearsDiff%9 >= 8;
 
@@ -61,25 +82,22 @@ function Reversal () {
     reversalEndDay.setFullYear(last.date.getFullYear() + firstAge + ageDelta + 1);
 
     let reversal = new Reversal();
-    reversal.start = reversalStartDay;
-    reversal.end = reversalEndDay;
-    reversal.ages = [
-      {
-        name: first.name,
-        age: firstAge,
-      },
-      {
-        name: last.name,
-        age: firstAge + ageDelta,
-      },
-    ];
+    reversal.setStartDate(reversalStartDay);
+    reversal.setEndDate(reversalEndDay);
+    reversal.setAges([
+      { name: first.name, age: firstAge },
+      { name: last.name, age: firstAge + ageDelta },
+    ]);
     return reversal;
   };
 
-  // Given an array of birthday objects, update and sort the internal array of Reversal objects.
+  /*
+   * Given an array of birthday objects, update and sort the internal array of Reversal objects.
+   */
   this.findReversals = function (days) {
-    var reversal;
+    var reversalDates;
     var dayI, dayJ;
+    let reversal;
     this.reversals = [];
 
     for (var i = 0; i < days.length; i++) {
@@ -87,14 +105,14 @@ function Reversal () {
       for (var j = i + 1; j < days.length; j++) {
         dayJ = days[j];
 
-        if (reversal = this.getReversal(dayI, dayJ)) {
+        if (reversal = this.getReversalDates(dayI, dayJ)) {
           this.reversals.push(reversal);
         }
       }
     }
     this.reversals.sort(function (a, b) {
-      if (a.start < b.start) return -1;
-      if (a.start > b.start) return 1;
+      if (a.startDate < b.startDate) return -1;
+      if (a.startDate > b.startDate) return 1;
       return 0;
     });
   };
