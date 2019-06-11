@@ -23,13 +23,13 @@ function Reversal () {
 
   this.toString = function() {
     return 'From ' +
-      (this.start.getMonth() + 1) + '/' +
-      (this.start.getDate()) + '/' +
-      (this.start.getFullYear()) +
+      (this.startDate.getMonth() + 1) + '/' +
+      (this.startDate.getDate()) + '/' +
+      (this.startDate.getFullYear()) +
       ' to ' +
-      (this.end.getMonth() + 1) + '/' +
-      (this.end.getDate()) + '/' +
-      (this.end.getFullYear()) +
+      (this.endDate.getMonth() + 1) + '/' +
+      (this.endDate.getDate()) + '/' +
+      (this.endDate.getFullYear()) +
       ', ' +
       this.ages[0].name + ' will be ' + this.ages[0].age +
       ' and ' +
