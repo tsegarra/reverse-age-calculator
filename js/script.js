@@ -1,32 +1,38 @@
 (function ($) {
-	var bdays = {},
+	let bdays = {};
 		nextBdayId = 0;
 
+  /*
+   * Display all found reversals on the UI.
+   */
 	var displayReversalsOnUI = function() {
 		$('.reversals-display-container').show();
     reversals = ReversalFinder.reversals;
 
-		if (reversals.length < 1) {
+		if (ReversalFinder.reversals.length < 1) {
 			$('#reversals-display').html('<p>No reversals found.</p>');
 			return;
 		}
 
 		$('#reversals-display').empty();
 
-		var reversalText;
-		for (var i = 0; i < reversals.length; i++) {
-      reversalText = reversals[i].toString();
+		let reversalText;
+		for (let i = 0; i < ReversalFinder.reversals.length; i++) {
+      reversalText = ReversalFinder.reversals[i].toString();
 			$('<p>').text(reversalText).appendTo('#reversals-display');
 		}
 	};
 
+  /*
+   * Read the current date input value into the birthday array.
+   */
 	var addNewBdayFromUI = function() {
-		var day = $('#day').val(),
+		let day = $('#day').val(),
 			month = $('#month').val(),
 			year = $('#year').val(),
 			name = $('#name').val();
 
-    var bday = {
+    let bday = {
       date: new Date(parseInt(year), parseInt(month) - 1, parseInt(day)),
       name: name,
     };
@@ -36,6 +42,10 @@
 		nextBdayId++;
 	};
 
+  /*
+   * Given a birthday element's ID, make the corresponding element
+   * editable in the UI.
+   */
 	var makeEditable = function(id) {
 		var bdayEl = $('#bday-' + id),
 			bdayNameEl = bdayEl.find('.bdayName'),
@@ -70,6 +80,10 @@
 		bdayEl.find('.bdayControlBtns').show();
 	};
 
+  /*
+   * Given the ID of a birthday UI element, apply changes in the birthday
+   * array, and make the UI element un-editable.
+   */
 	var makeUneditable = function(id) {
 		var bdayEl = $('#bday-' + id),
 			bdayNameEl = bdayEl.find('.bdayName'),
@@ -101,6 +115,9 @@
 		bdayEl.find('.bdayControlBtns').hide();
 	};
 
+  /**
+   * Given an ID and a Birthday object, add a birthday element to the UI.
+   */
 	var addNewBdayToUI = function(id, bday) {
 		var bdayHTML = '<span class="bdayName">' + bday.name + '</span>' +
 			' &mdash; ' + 
@@ -134,6 +151,9 @@
 			.appendTo(controlBtns);
 	};
 
+  /**
+   * Reset the birthday input field.
+   */
 	var resetBdayField = function() {
 		$('#day').val('');
 		$('#month').val('');
@@ -141,6 +161,9 @@
 		$('#name').val('');
 	};
 
+  /**
+   * Show or hide Next button depending on whether all fields are filled.
+   */
 	var updateButtonVisibility = function() {
 		if ($('#name').val() == '' || $('#month').val() == null ||
 				$('#year').val() == null || $('#day').val() == null) {
@@ -150,6 +173,10 @@
 		}
 	};
 
+  /**
+   * If at least 2 birthdays have been entered, run the reversal finder
+   * and display the results in the UI.
+   */
 	var checkForReversals = function() {
 		if (Object.keys(bdays).length >= 2) {
 			ReversalFinder.findReversals(Object.values(bdays));
