@@ -22,106 +22,58 @@ function Reversal () {
 (function() {
   this.reversals = [];
 
-  // Given two dates, return null if no reversal, else return
-  // { cycle: yearDiff%9, pos: +-1 }
-	var isReversal = function (a, b) {
-    var msPerYear = 1000*60*60*24*365;
-
-    var modNum = Math.abs((b - a)/msPerYear)%9,
-      reversalExists = modNum < 1 || modNum > 8;
-    var pos = modNum < 1 ? -1 : 1;
-
-    var cycle = modNum < 1 ? Math.sign(b - a) * Math.floor(Math.abs(b - a)/msPerYear)/9 :
-        Math.sign(b - a) * Math.ceil(Math.abs(b - a)/msPerYear)/9;
-
-    return reversalExists ? { cycle: cycle, pos: pos } : null;
-	};
-
   // Given 2 bday objects, return a reversal obj if a reversal is found, else null.
   this.getReversal = function (dayI, dayJ) {
-    var nextReversalFound = false;
-    var millisecondsPerYear = 1000*60*60*24*365;
-    var numCycles, startYear;
-    var reversalStartDay, reversalEndDay;
-    var reversal;
-    var first, last;
+    const millisecondsPerYear = 1000*60*60*24*365;
 
-    if (numCycles = isReversal(dayI.date, dayJ.date)) {
-      // Given the number of cycles and the configuration, construct a Reversal object w
-      // start/end date, ages, and names.
+    let yearsDiff = Math.abs((dayJ.date - dayI.date)/millisecondsPerYear),
+      reversalExists = yearsDiff%9 <= 1 || yearsDiff%9 >= 8;
 
-      if (numCycles.cycle == 0) return null;
+    if (!reversalExists) return null;
 
-      // --- start finding start/endDays ---
+    let closestMultipleOf9 = yearsDiff%9 <= 1 ?
+        Math.floor(Math.abs(dayJ.date - dayI.date)/millisecondsPerYear) :
+        Math.ceil(Math.abs(dayJ.date - dayI.date)/millisecondsPerYear);
+    let cycle = Math.sign(dayJ.date - dayI.date) * closestMultipleOf9/9;
 
-      reversalStartDay = new Date();
-      reversalEndDay = new Date();
+    // If the ages are the same, reject as trivial.
+    if (cycle == 0) return null;
 
-      // True iff J comes after I (year invariant)
-      reverse = dayJ.date.getMonth() > dayI.date.getMonth() ||
-        ((dayJ.date.getMonth() == dayI.date.getMonth()) && dayJ.date.getDate() > dayI.date.getDate());
-
-      if (numCycles.pos < 0) {
-        reversalStartDay.setMonth(dayI.date.getMonth());
-        reversalStartDay.setDate(dayI.date.getDate());
-        reversalEndDay.setMonth(dayJ.date.getMonth());
-        reversalEndDay.setDate(dayJ.date.getDate());
-        if (reverse) {
-          reversalStartDay.setFullYear((dayJ.date.getYear() + 1900) + numCycles.cycle + 1);
-        } else {
-          reversalStartDay.setFullYear((dayJ.date.getYear() + 1900) + numCycles.cycle);
-        }
-      } else {
-        reversalStartDay.setMonth(dayJ.date.getMonth());
-        reversalStartDay.setDate(dayJ.date.getDate());
-        reversalEndDay.setMonth(dayI.date.getMonth());
-        reversalEndDay.setDate(dayI.date.getDate());
-        reversalStartDay.setFullYear((dayI.date.getYear() + 1900) + numCycles.cycle);
-        if (reverse) {
-          reversalStartDay.setFullYear((dayJ.date.getYear() + 1900) + numCycles.cycle);
-        } else {
-          reversalStartDay.setFullYear((dayJ.date.getYear() + 1900) + numCycles.cycle);
-        }
-      }
-      while (!nextReversalFound) {
-        if (reversalStartDay >= new Date()) {
-          nextReversalFound = true;
-        } else {
-          reversalStartDay.setFullYear(reversalStartDay.getYear() + 1900 + 11);
-        }
-      }
-
-      reversalEndDay.setFullYear(reversalStartDay.getYear() + 1900);
-      if (reverse) {
-        if (numCycles.pos > 0) {
-          reversalEndDay.setFullYear(reversalEndDay.getYear() + 1900 + 1);
-        }
-      } else {
-        if (numCycles.pos < 0) {
-          reversalEndDay.setFullYear(reversalEndDay.getYear() + 1900 + 1);
-        }
-      }
-
-      // --- end finding start/endDays ---
-
-      first = numCycles.pos > 0 ? dayJ : dayI;
-      last = numCycles.pos < 0 ? dayJ : dayI;
-      reversal = new Reversal();
-      reversal.start = reversalStartDay;
-      reversal.end = reversalEndDay;
-      reversal.ages = [
-        {
-          name: first.name,
-          age: Math.floor((reversalStartDay.getTime() - first.date.getTime())/millisecondsPerYear)
-        },
-        {
-          name: last.name,
-          age: Math.floor((reversalStartDay.getTime() - last.date.getTime())/millisecondsPerYear)
-        },
-      ];
-      return reversal;
+    let lookBackwards = yearsDiff%9 < 1;
+    let first = !lookBackwards ? dayJ : dayI,
+      last = lookBackwards ? dayJ : dayI;
+    
+    let reversalStartDay = new Date(first.date.getTime());
+    if (first < last) {
+      reversalStartDay.setFullYear(dayI.date.getFullYear() + cycle);
+    } else {
+      reversalStartDay.setFullYear(dayI.date.getFullYear() + cycle*10);
     }
-    return null;
+
+    let now = new Date();
+    while (reversalStartDay < now) {
+      reversalStartDay.setFullYear(reversalStartDay.getFullYear() + 11);
+    }
+
+    let reversalEndDay = new Date(last.date.getTime());
+    let firstAge = reversalStartDay.getFullYear() - first.date.getFullYear();
+    let ageDelta = lookBackwards ? cycle*-9 : cycle*9;
+    reversalEndDay.setFullYear(last.date.getFullYear() + firstAge + ageDelta + 1);
+
+    let reversal = new Reversal();
+    reversal.start = reversalStartDay;
+    reversal.end = reversalEndDay;
+    reversal.ages = [
+      {
+        name: first.name,
+        age: firstAge,
+      },
+      {
+        name: last.name,
+        age: firstAge + ageDelta,
+      },
+    ];
+    return reversal;
   };
 
   // Given an array of birthday objects, update and sort the internal array of Reversal objects.
