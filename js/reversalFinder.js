@@ -4,39 +4,23 @@ function Reversal () {
   var startDate;
   var endDate;
   var ages;
-
-  this.setStartDate = function (startDate) {
-    this.startDate = startDate;
-  };
-
-  this.setEndDate = function (endDate) {
-    this.endDate = endDate;
-  };
-
-  this.setAges = function (ages) {
-    this.ages = ages;
-  };
-
-  this.getStartDate = function() { return this.startDate; }
-  this.getEndDate = function() { return this.endDate; }
-  this.getAges = function() { return this.ages; }
-
-  this.toString = function() {
-    return 'From ' +
-      (this.startDate.getMonth() + 1) + '/' +
-      (this.startDate.getDate()) + '/' +
-      (this.startDate.getFullYear()) +
-      ' to ' +
-      (this.endDate.getMonth() + 1) + '/' +
-      (this.endDate.getDate()) + '/' +
-      (this.endDate.getFullYear()) +
-      ', ' +
-      this.ages[0].name + ' will be ' + this.ages[0].age +
-      ' and ' +
-      this.ages[1].name + ' will be ' + this.ages[1].age +
-      '.';
-  };
 }
+
+Reversal.prototype.toString = function() {
+  return 'From ' +
+    (this.startDate.getMonth() + 1) + '/' +
+    (this.startDate.getDate()) + '/' +
+    (this.startDate.getFullYear()) +
+    ' to ' +
+    (this.endDate.getMonth() + 1) + '/' +
+    (this.endDate.getDate()) + '/' +
+    (this.endDate.getFullYear()) +
+    ', ' +
+    this.ages[0].name + ' will be ' + this.ages[0].age +
+    ' and ' +
+    this.ages[1].name + ' will be ' + this.ages[1].age +
+    '.';
+};
 
 (function() {
   const millisecondsPerYear = 1000*60*60*24*365;
@@ -82,12 +66,12 @@ function Reversal () {
     reversalEndDay.setFullYear(last.date.getFullYear() + firstAge + ageDelta + 1);
 
     let reversal = new Reversal();
-    reversal.setStartDate(reversalStartDay);
-    reversal.setEndDate(reversalEndDay);
-    reversal.setAges([
+    reversal.startDate = reversalStartDay;
+    reversal.endDate = reversalEndDay;
+    reversal.ages = [
       { name: first.name, age: firstAge },
       { name: last.name, age: firstAge + ageDelta },
-    ]);
+    ];
     return reversal;
   };
 
