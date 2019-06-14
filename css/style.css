@@ -59,6 +59,11 @@ form.bday-entry-field {
 	margin:0;
 }
 
+.bday-entry-field > input,
+.bday-entry-field > select {
+  margin-right:4px;
+}
+
 .bdayControlBtns {
 	display:none;
 	margin-top:8px;

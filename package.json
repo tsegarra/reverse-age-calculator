@@ -1,5 +1,26 @@
 {
   "scripts": {
+    "babel": "babel --presets react js/reactScript.js -o build/main.js",
     "test": "jest"
+  },
+  "name": "reverse-age-calculator",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsegarra/reverse-age-calculator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tsegarra/reverse-age-calculator/issues"
+  },
+  "homepage": "https://github.com/tsegarra/reverse-age-calculator#readme",
+  "description": "",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1"
+  },
+  "dependencies": {
+    "babel-preset-react": "^6.24.1"
   }
 }
