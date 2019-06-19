@@ -23,6 +23,8 @@ Reversal.prototype.toString = function() {
 };
 
 (function() {
+  // @TODO consider having this module not use .call(), but just be an IIFE named ReversalFinder,
+  // which returns an object whose props are all public methods
   const millisecondsPerYear = 1000*60*60*24*365;
 
   this.reversals = [];
@@ -99,6 +101,8 @@ Reversal.prototype.toString = function() {
       if (a.startDate > b.startDate) return 1;
       return 0;
     });
+
+    return this.reversals;
   };
 }).call(ReversalFinder);
 
